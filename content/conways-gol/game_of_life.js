@@ -175,7 +175,7 @@ var game_of_life = function (_, Kotlin) {
       this.context.restore();
       this.context.save();
       this.context.font = '16pt Arial';
-      var msg = 'Controls: Mouse | [P]ause | [R]eset';
+      var msg = 'Controls: Mouse | [S]tart and [S]top | [R]eset';
       var bounds = this.context.measureText(msg);
       var heightApproximation = this.context.measureText('A').width;
       this.context.fillStyle = 'rgba(255, 255, 255, 1)';
@@ -197,7 +197,7 @@ var game_of_life = function (_, Kotlin) {
     var tmp$;
     var event = Kotlin.isType(tmp$ = raw, KeyboardEvent) ? tmp$ : throwCCE();
     switch (event.code) {
-      case 'KeyP':
+      case 'KeyS':
         this.paused = !this.paused;
         break;
       case 'KeyR':
