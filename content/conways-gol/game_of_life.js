@@ -22,8 +22,8 @@ var game_of_life = function (_, Kotlin) {
     var tmp$, tmp$_0;
     var canvas = Kotlin.isType(tmp$ = document.createElement('canvas'), HTMLCanvasElement) ? tmp$ : throwCCE();
     var context = Kotlin.isType(tmp$_0 = canvas.getContext('2d'), CanvasRenderingContext2D) ? tmp$_0 : throwCCE();
-    context.canvas.width = window.innerWidth - 10 | 0;
-    context.canvas.height = window.innerHeight - 10 | 0;
+    context.canvas.width = window.innerWidth;
+    context.canvas.height = window.innerHeight;
     ensureNotNull(document.body).appendChild(canvas);
     return canvas;
   }
