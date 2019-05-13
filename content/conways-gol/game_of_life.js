@@ -10,8 +10,12 @@ var game_of_life = function (_, Kotlin) {
   var Unit = Kotlin.kotlin.Unit;
   var getCallableRef = Kotlin.getCallableRef;
   var numberToInt = Kotlin.numberToInt;
+  var Math_0 = Math;
   var IntRange = Kotlin.kotlin.ranges.IntRange;
   var print = Kotlin.kotlin.io.print_s8jyv4$;
+  var Array_0 = Array;
+  var Random = Kotlin.kotlin.random.Random;
+  var random = Kotlin.kotlin.ranges.random_xmiyix$;
   function clamp($receiver, min, max) {
     return $receiver < min ? $receiver : $receiver > max ? max : $receiver;
   }
@@ -140,15 +144,20 @@ var game_of_life = function (_, Kotlin) {
   };
   function JSApplication$render$lambda(this$JSApplication) {
     return function (x, y) {
-      var alive = this$JSApplication.grid.current[x][y] === 1;
+      var alive = this$JSApplication.grid.current[x][y] > 0;
       if (alive) {
-        this$JSApplication.context.fillStyle = 'rgba(200, 30, 180, 1)';
+        var ageLimit = 8;
+        var age = clamp(this$JSApplication.grid.current[x][y], 0, ageLimit);
+        var t = ratio(age, ageLimit);
+        var r = 230 - 30 * t;
+        var g = 170 - 90 * t;
+        var b = 200 - 70 * t;
+        this$JSApplication.context.fillStyle = 'rgba(' + numberToInt(r) + ', ' + numberToInt(g) + ', ' + numberToInt(b) + ', 1)';
         this$JSApplication.context.fillRect(x * this$JSApplication.layout.slotWidth, y * this$JSApplication.layout.slotHeight, this$JSApplication.layout.slotWidth, this$JSApplication.layout.slotHeight);
       }
       return Unit;
     };
   }
-  var Math_0 = Math;
   JSApplication.prototype.render = function () {
     var newWidth = window.innerWidth;
     var newHeight = window.innerHeight;
@@ -170,7 +179,7 @@ var game_of_life = function (_, Kotlin) {
       this.context.save();
       this.context.fillStyle = 'rgba(170, 80, 110, 0.25)';
       this.context.fillRect(0.0, 0.0, this.layout.width, this.layout.height);
-      this.context.fillStyle = 'rgba(220, 80, 110, 0.9)';
+      this.context.fillStyle = 'rgba(220, 80, 110, 0.25)';
       this.context.fillRect(0.0, baseY - height / 2.0, this.layout.width, height);
       this.context.restore();
       this.context.save();
@@ -269,7 +278,9 @@ var game_of_life = function (_, Kotlin) {
     simpleName: 'JSApplication',
     interfaces: []
   };
-  var Array_0 = Array;
+  function ratio(a, b) {
+    return a / b;
+  }
   function Grid(w, h) {
     this.w = w;
     this.h = h;
@@ -315,8 +326,6 @@ var game_of_life = function (_, Kotlin) {
       }
     }
   }
-  var Random = Kotlin.kotlin.random.Random;
-  var random = Kotlin.kotlin.ranges.random_xmiyix$;
   function randomize$lambda(closure$rng, this$randomize) {
     return function (x, y) {
       this$randomize.current[x][y] = random(closure$rng, Random.Default);
@@ -328,12 +337,6 @@ var game_of_life = function (_, Kotlin) {
     scan($receiver, randomize$lambda(rng, $receiver));
   }
   function step$lambda(this$step) {
-    return function (x, y) {
-      this$step.previous[x][y] = this$step.current[x][y];
-      return Unit;
-    };
-  }
-  function step$lambda_0(this$step) {
     return function (x, y) {
       var neighbours = 0;
       var left = (x + this$step.w - 1 | 0) % this$step.w;
@@ -348,9 +351,9 @@ var game_of_life = function (_, Kotlin) {
       neighbours = neighbours + (this$step.previous[right][down] > 0 ? 1 : 0) | 0;
       neighbours = neighbours + (this$step.previous[left][up] > 0 ? 1 : 0) | 0;
       neighbours = neighbours + (this$step.previous[right][up] > 0 ? 1 : 0) | 0;
-      var alive = this$step.previous[x][y] === 1;
+      var alive = this$step.previous[x][y] > 0;
       if (alive && (2 <= neighbours && neighbours <= 3))
-        this$step.current[x][y] = this$step.previous[x][y];
+        this$step.current[x][y] = this$step.previous[x][y] + 1 | 0;
       else if (!alive && neighbours === 3)
         this$step.current[x][y] = 1;
       else
@@ -359,8 +362,10 @@ var game_of_life = function (_, Kotlin) {
     };
   }
   function step($receiver) {
+    var tmp = $receiver.previous;
+    $receiver.previous = $receiver.current;
+    $receiver.current = tmp;
     scan($receiver, step$lambda($receiver));
-    scan($receiver, step$lambda_0($receiver));
   }
   function clear$lambda(this$clear) {
     return function (x, y) {
@@ -372,7 +377,15 @@ var game_of_life = function (_, Kotlin) {
     scan($receiver, clear$lambda($receiver));
   }
   function isWithinBounds($receiver, x, y) {
-    return x >= 0 && x < $receiver.w && y >= 0 && y < $receiver.h;
+    var tmp$, tmp$_0, tmp$_1;
+    tmp$ = $receiver.w;
+    if (0 <= x && x < tmp$) {
+      tmp$_0 = $receiver.h;
+      tmp$_1 = (0 <= y && y < tmp$_0);
+    }
+     else
+      tmp$_1 = false;
+    return tmp$_1;
   }
   function print_0($receiver) {
     var tmp$, tmp$_0;
@@ -393,6 +406,7 @@ var game_of_life = function (_, Kotlin) {
   _.GridLayout = GridLayout;
   _.V2 = V2;
   _.JSApplication = JSApplication;
+  _.ratio_vux9f0$ = ratio;
   var package$gol = _.gol || (_.gol = {});
   package$gol.Grid = Grid;
   package$gol.scan_w3mylu$ = scan;
