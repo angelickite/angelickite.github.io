@@ -13,10 +13,15 @@ var game_of_life = function (_, Kotlin) {
   var numberToInt = Kotlin.numberToInt;
   var coerceIn = Kotlin.kotlin.ranges.coerceIn_e4yvb3$;
   var IntRange = Kotlin.kotlin.ranges.IntRange;
+  var listOf = Kotlin.kotlin.collections.listOf_i5x0yv$;
   var print = Kotlin.kotlin.io.print_s8jyv4$;
   var max = Kotlin.kotlin.collections.max_tmsbgo$;
   var get_indices = Kotlin.kotlin.collections.get_indices_tmsbgo$;
   var toList = Kotlin.kotlin.collections.toList_7wnvza$;
+  var math = Kotlin.kotlin.math;
+  function toRadians($receiver) {
+    return $receiver * degreesToRadians;
+  }
   function main() {
     (new JSApplication()).run();
   }
@@ -176,6 +181,47 @@ var game_of_life = function (_, Kotlin) {
     this.context.save();
     scan(this.grid, JSApplication$render$lambda(this));
     this.context.restore();
+    var tmp$_0 = getTotalTeamCounts(this.grid);
+    var total = tmp$_0.component1()
+    , teamCounts = tmp$_0.component2();
+    var colorNeutral = 'rgba(100, 60, 80, 1)';
+    var alpha = 0.5;
+    var posX = 0.5 * this.layout.width;
+    var posY = 0.15 * this.layout.height;
+    var a = this.layout.width;
+    var b = this.layout.height;
+    var radius = 0.1 * Math_0.min(a, b);
+    var dAngle = 0.0;
+    if (total === 0) {
+      this.context.save();
+      this.context.fillStyle = colorNeutral;
+      this.context.globalAlpha = alpha;
+      this.context.beginPath();
+      this.context.moveTo(posX, posY);
+      this.context.arc(posX, posY, radius, toRadians(dAngle), toRadians(360.0));
+      this.context.closePath();
+      this.context.fill();
+      this.context.restore();
+    }
+     else {
+      for (var i = 0; i !== teamCounts.size; ++i) {
+        var team = 1 + i | 0;
+        var teamCount = teamCounts.get_za3lpa$(i);
+        var ratio_0 = ratio(teamCount, total);
+        var color = this.getTeamColor_za3lpa$(team);
+        var step = ratio_0 * 360.0;
+        this.context.save();
+        this.context.fillStyle = color;
+        this.context.globalAlpha = alpha;
+        this.context.beginPath();
+        this.context.moveTo(posX, posY);
+        this.context.arc(posX, posY, radius, toRadians(dAngle), toRadians(dAngle + step));
+        this.context.closePath();
+        this.context.fill();
+        this.context.restore();
+        dAngle += step;
+      }
+    }
     if (this.paused) {
       var baseY = this.layout.height * 50.0 / 100.0;
       var height = this.layout.height / 15.0;
@@ -244,6 +290,9 @@ var game_of_life = function (_, Kotlin) {
       case 'Digit4':
       case 'Numpad4':
         this.placementTeam = 4;
+        break;
+      case 'Numpad9':
+        randomize(this.grid, new IntRange(-50, 4));
         break;
     }
   };
@@ -368,15 +417,14 @@ var game_of_life = function (_, Kotlin) {
   }
   var Random = Kotlin.kotlin.random.Random;
   var random = Kotlin.kotlin.ranges.random_xmiyix$;
-  function randomize$lambda(closure$rng, this$randomize) {
+  function randomize$lambda(closure$valueSet, this$randomize) {
     return function (x, y) {
-      this$randomize.current[x][y] = random(closure$rng, Random.Default);
+      this$randomize.current[x][y] = random(closure$valueSet, Random.Default);
       return Unit;
     };
   }
-  function randomize($receiver) {
-    var rng = new IntRange(0, 1);
-    scan($receiver, randomize$lambda(rng, $receiver));
+  function randomize($receiver, valueSet) {
+    scan($receiver, randomize$lambda(valueSet, $receiver));
   }
   function step$lambda$teamCount(closure$left, closure$right, closure$down, closure$up, closure$leftDown, closure$leftUp, closure$rightDown, closure$rightUp) {
     return function (team) {
@@ -512,6 +560,63 @@ var game_of_life = function (_, Kotlin) {
     $receiver.current = newCurrent.v;
     $receiver.previous = newPrevious;
   }
+  function TeamCounts(total, teams) {
+    this.total = total;
+    this.teams = teams;
+  }
+  TeamCounts.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'TeamCounts',
+    interfaces: []
+  };
+  TeamCounts.prototype.component1 = function () {
+    return this.total;
+  };
+  TeamCounts.prototype.component2 = function () {
+    return this.teams;
+  };
+  TeamCounts.prototype.copy_oku237$ = function (total, teams) {
+    return new TeamCounts(total === void 0 ? this.total : total, teams === void 0 ? this.teams : teams);
+  };
+  TeamCounts.prototype.toString = function () {
+    return 'TeamCounts(total=' + Kotlin.toString(this.total) + (', teams=' + Kotlin.toString(this.teams)) + ')';
+  };
+  TeamCounts.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.total) | 0;
+    result = result * 31 + Kotlin.hashCode(this.teams) | 0;
+    return result;
+  };
+  TeamCounts.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.total, other.total) && Kotlin.equals(this.teams, other.teams)))));
+  };
+  function getTotalTeamCounts$lambda(this$getTotalTeamCounts, closure$team1, closure$team2, closure$team3, closure$team4) {
+    return function (x, y) {
+      switch (this$getTotalTeamCounts.current[x][y]) {
+        case 1:
+          closure$team1.v = closure$team1.v + 1 | 0;
+          break;
+        case 2:
+          closure$team2.v = closure$team2.v + 1 | 0;
+          break;
+        case 3:
+          closure$team3.v = closure$team3.v + 1 | 0;
+          break;
+        case 4:
+          closure$team4.v = closure$team4.v + 1 | 0;
+          break;
+      }
+      return Unit;
+    };
+  }
+  function getTotalTeamCounts($receiver) {
+    var team1 = {v: 0};
+    var team2 = {v: 0};
+    var team3 = {v: 0};
+    var team4 = {v: 0};
+    scan($receiver, getTotalTeamCounts$lambda($receiver, team1, team2, team3, team4));
+    return new TeamCounts(team1.v + team2.v + team3.v + team4.v | 0, listOf([team1.v, team2.v, team3.v, team4.v]));
+  }
   function isWithinBounds($receiver, x, y) {
     var tmp$, tmp$_0, tmp$_1;
     tmp$ = $receiver.w;
@@ -580,6 +685,8 @@ var game_of_life = function (_, Kotlin) {
     }
     return toList(indices);
   }
+  var degreesToRadians;
+  _.toRadians_yrwdxr$ = toRadians;
   _.main = main;
   _.initalizeCanvas = initalizeCanvas;
   _.GridLayout = GridLayout;
@@ -589,15 +696,23 @@ var game_of_life = function (_, Kotlin) {
   var package$gol = _.gol || (_.gol = {});
   package$gol.Grid = Grid;
   package$gol.scan_w3mylu$ = scan;
-  package$gol.randomize_nu4q73$ = randomize;
+  package$gol.randomize_5ibkfs$ = randomize;
   package$gol.step_nu4q73$ = step;
   package$gol.clear_nu4q73$ = clear;
   package$gol.resize_3vi24z$ = resize;
+  package$gol.TeamCounts = TeamCounts;
+  package$gol.getTotalTeamCounts_nu4q73$ = getTotalTeamCounts;
   package$gol.isWithinBounds_3vi24z$ = isWithinBounds;
   package$gol.print_nu4q73$ = print_0;
   _.max_pmhfmb$ = max_0;
   _.maxIndex_pmhfmb$ = maxIndex;
   _.maxIndices_pmhfmb$ = maxIndices;
+  Object.defineProperty(_, 'degreesToRadians', {
+    get: function () {
+      return degreesToRadians;
+    }
+  });
+  degreesToRadians = math.PI / 180.0;
   main();
   Kotlin.defineModule('game_of_life', _);
   return _;
