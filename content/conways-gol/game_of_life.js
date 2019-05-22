@@ -181,47 +181,6 @@ var game_of_life = function (_, Kotlin) {
     this.context.save();
     scan(this.grid, JSApplication$render$lambda(this));
     this.context.restore();
-    var tmp$_0 = getTotalTeamCounts(this.grid);
-    var total = tmp$_0.component1()
-    , teamCounts = tmp$_0.component2();
-    var colorNeutral = 'rgba(100, 60, 80, 1)';
-    var alpha = 0.5;
-    var posX = 0.5 * this.layout.width;
-    var posY = 0.15 * this.layout.height;
-    var a = this.layout.width;
-    var b = this.layout.height;
-    var radius = 0.1 * Math_0.min(a, b);
-    var dAngle = 0.0;
-    if (total === 0) {
-      this.context.save();
-      this.context.fillStyle = colorNeutral;
-      this.context.globalAlpha = alpha;
-      this.context.beginPath();
-      this.context.moveTo(posX, posY);
-      this.context.arc(posX, posY, radius, toRadians(dAngle), toRadians(360.0));
-      this.context.closePath();
-      this.context.fill();
-      this.context.restore();
-    }
-     else {
-      for (var i = 0; i !== teamCounts.size; ++i) {
-        var team = 1 + i | 0;
-        var teamCount = teamCounts.get_za3lpa$(i);
-        var ratio_0 = ratio(teamCount, total);
-        var color = this.getTeamColor_za3lpa$(team);
-        var step = ratio_0 * 360.0;
-        this.context.save();
-        this.context.fillStyle = color;
-        this.context.globalAlpha = alpha;
-        this.context.beginPath();
-        this.context.moveTo(posX, posY);
-        this.context.arc(posX, posY, radius, toRadians(dAngle), toRadians(dAngle + step));
-        this.context.closePath();
-        this.context.fill();
-        this.context.restore();
-        dAngle += step;
-      }
-    }
     if (this.paused) {
       var baseY = this.layout.height * 50.0 / 100.0;
       var height = this.layout.height / 15.0;
