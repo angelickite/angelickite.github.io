@@ -477,6 +477,9 @@ var game_of_life = function (_, Kotlin) {
     };
   }
   function resize($receiver, newWidth, newHeight) {
+    var dimensionsChanged = $receiver.w !== newWidth || $receiver.h !== newHeight;
+    if (!dimensionsChanged)
+      return;
     var array = Array_0(newWidth);
     var tmp$;
     tmp$ = array.length - 1 | 0;
