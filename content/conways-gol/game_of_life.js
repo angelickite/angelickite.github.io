@@ -9,6 +9,7 @@ var game_of_life = function (_, Kotlin) {
   var throwUPAE = Kotlin.throwUPAE;
   var Unit = Kotlin.kotlin.Unit;
   var getCallableRef = Kotlin.getCallableRef;
+  var Pair = Kotlin.kotlin.Pair;
   var numberToInt = Kotlin.numberToInt;
   var coerceIn = Kotlin.kotlin.ranges.coerceIn_e4yvb3$;
   var IntRange = Kotlin.kotlin.ranges.IntRange;
@@ -57,6 +58,7 @@ var game_of_life = function (_, Kotlin) {
   };
   function JSApplication() {
     this.golSpeed = 100;
+    this.slotSize = 20;
     this.canvas_296s3p$_0 = this.canvas_296s3p$_0;
     this.context_6ij83y$_0 = this.context_6ij83y$_0;
     this.layout_c1wnkn$_0 = this.layout_c1wnkn$_0;
@@ -123,17 +125,20 @@ var game_of_life = function (_, Kotlin) {
     document.addEventListener('mousemove', getCallableRef('onMouseMove', function ($receiver, raw) {
       return $receiver.onMouseMove_9ojx7i$(raw), Unit;
     }.bind(null, this)));
-    this.createGrid();
+    var tmp$_0 = this.getGridSize();
+    var w = tmp$_0.component1()
+    , h = tmp$_0.component2();
+    this.grid = new Grid(w, h);
+    this.layout = new GridLayout(this.grid, this.canvas.offsetLeft, this.canvas.offsetTop, this.canvas.width, this.canvas.height);
     this.reset();
   };
   JSApplication.prototype.reset = function () {
     clear(this.grid);
     this.paused = true;
   };
-  JSApplication.prototype.createGrid = function () {
-    var scale = 20;
-    this.grid = new Grid(this.canvas.width / scale | 0, this.canvas.height / scale | 0);
-    this.layout = new GridLayout(this.grid, this.canvas.offsetLeft, this.canvas.offsetTop, this.canvas.width, this.canvas.height);
+  JSApplication.prototype.getGridSize = function () {
+    var scale = this.slotSize;
+    return new Pair(this.canvas.width / scale | 0, this.canvas.height / scale | 0);
   };
   JSApplication.prototype.updateGoL = function () {
     if (!this.paused) {
@@ -158,7 +163,11 @@ var game_of_life = function (_, Kotlin) {
     if (newWidth !== this.layout.width || newHeight !== this.layout.height) {
       this.context.canvas.width = newWidth;
       this.context.canvas.height = newHeight;
-      this.createGrid();
+      var tmp$ = this.getGridSize();
+      var w = tmp$.component1()
+      , h = tmp$.component2();
+      resize(this.grid, w, h);
+      this.layout = new GridLayout(this.grid, this.canvas.offsetLeft, this.canvas.offsetTop, this.canvas.width, this.canvas.height);
     }
     this.context.save();
     this.context.fillStyle = 'rgba(20, 30, 40, 1)';
@@ -459,6 +468,47 @@ var game_of_life = function (_, Kotlin) {
   function clear($receiver) {
     scan($receiver, clear$lambda($receiver));
   }
+  function resize$lambda(closure$newWidth, closure$newHeight, this$resize, closure$newCurrent) {
+    return function (x, y) {
+      if (0 <= x && x < closure$newWidth && (0 <= y && y < closure$newHeight)) {
+        closure$newCurrent.v[x][y] = this$resize.current[x][y];
+      }
+      return Unit;
+    };
+  }
+  function resize($receiver, newWidth, newHeight) {
+    var array = Array_0(newWidth);
+    var tmp$;
+    tmp$ = array.length - 1 | 0;
+    for (var i = 0; i <= tmp$; i++) {
+      var array_0 = Array_0(newHeight);
+      var tmp$_0;
+      tmp$_0 = array_0.length - 1 | 0;
+      for (var i_0 = 0; i_0 <= tmp$_0; i_0++) {
+        array_0[i_0] = 0;
+      }
+      array[i] = array_0;
+    }
+    var newCurrent = {v: array};
+    var array_1 = Array_0(newWidth);
+    var tmp$_1;
+    tmp$_1 = array_1.length - 1 | 0;
+    for (var i_1 = 0; i_1 <= tmp$_1; i_1++) {
+      var array_2 = Array_0(newHeight);
+      var tmp$_2;
+      tmp$_2 = array_2.length - 1 | 0;
+      for (var i_2 = 0; i_2 <= tmp$_2; i_2++) {
+        array_2[i_2] = 0;
+      }
+      array_1[i_1] = array_2;
+    }
+    var newPrevious = array_1;
+    scan($receiver, resize$lambda(newWidth, newHeight, $receiver, newCurrent));
+    $receiver.w = newWidth;
+    $receiver.h = newHeight;
+    $receiver.current = newCurrent.v;
+    $receiver.previous = newPrevious;
+  }
   function isWithinBounds($receiver, x, y) {
     var tmp$, tmp$_0, tmp$_1;
     tmp$ = $receiver.w;
@@ -539,6 +589,7 @@ var game_of_life = function (_, Kotlin) {
   package$gol.randomize_nu4q73$ = randomize;
   package$gol.step_nu4q73$ = step;
   package$gol.clear_nu4q73$ = clear;
+  package$gol.resize_3vi24z$ = resize;
   package$gol.isWithinBounds_3vi24z$ = isWithinBounds;
   package$gol.print_nu4q73$ = print_0;
   _.max_pmhfmb$ = max_0;
